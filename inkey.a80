@@ -1,0 +1,91 @@
+;/* update 21:18 2.10.2016
+;
+;Busy's inkey routine taken from MRS
+;
+;
+;"# inkey 03"
+;Rutina INKEY na zacitanie prave stlacenej klavesy
+;...pracuje presne tak ako funkcia INKEY$ v basicu
+;Vracia:ASCII-kod prave stlacenej klavesy v registri A
+;ak nie je nic stlacene tak vrati nulu
+;prizrak ZERO sa nastavi podla nulovosti registra A
+;*/
+
+za	
+inkey	push hl                  ;Odlozenie
+	push de                  ;povodneho
+	push bc                  ;obsahu registrov
+	ld   bc,$7ffe            ;adresa portu prvej polrady
+	ld   h,$00               ;h=pocitadlo klaves
+	ld   d,h                 ;d,e=pomocny buffer pre
+	ld   e,h                 ;dve stlacene klavesy
+ii1	ld   l,$05               ;v kazdej polrade je 5 klaves
+	in   a,(c)               ;nacitanie polrady klavesnice
+ii2	inc  h                   ;pre kazdy test sa pripocita +1
+	rrca                     ;test jednej klavesy z polrady
+	jr   c,ii3               ;nestlacena - skok
+	ld   d,e                 ;stlacena: zapise sa do pomocneho
+	ld   e,h                 ;buffera (tvoreneho registrom de)
+ii3	dec  l                   ;A toto vsetko opakuj
+	jr   nz,ii2              ;pre vsetky klavesy z polrady
+	rrc  b                   ;A toto vsetko opakuj
+	jr   c,ii1               ;pre vsetky polrady klavesnice
+	ld   a,e                 ;\
+
+	cp   $24                 ;Prehodenie poradia klaves tak
+	jr   nz,ii5              ;aby shifty boli v registri D
+	ld   e,d                 ;a vyznamne klavesy v E
+	ld   d,$24               ; |
+ii5	cp   $02                 ; |
+	jr   nz,ii6              ; |
+	ld   e,d                 ; |
+	ld   d,$02               ;/
+ii6	ld   hl,iinn             ;Z tabulky pre neshiftove
+	xor  a                   ;klavesy sa bude citat
+	xor  d                   ;ak nebol stlaceny ziadny shift
+	jr   z,ii7               ;- vtedy skoc
+	ld   hl,iiss             ;Ak bol stlaceny symbol shift
+	cp   $02                 ;tak sa bude citat z tejto
+	jr   z,ii7               ;tabulky - vtedy skoc
+	ld   hl,iics             ;A na koniec je tu tabulka
+	cp   $24                 ;pre caps shift
+	jr   z,ii7               ;- vtedy skoc
+	ld   a,$01               ;Ak su stlacene dve vyznamne
+	jr   ii8                 ;klavesy - vtedy sa vrati kod #01
+ii7	ld   d,$00               ;Prekodovanie kodovania klaves
+	add  hl,de               ;podla pocitadla na kod ASCII
+	ld   a,(hl)              ;Ak nie je nic stlacene,
+ii8	and  a                   ;bude a=#00 a teda aj zero.
+	pop  bc                  ;Obnovenie
+	pop  de                  ;povodneho
+	pop  hl                  ;obsahu registrov
+	ret                      ;a koniec rutinky.
+
+iinn	db   $00," ",$1c,"mnb"   ;Tabulka klaves
+        db   13,"lkjh"           ;pre neshiftove klavesy
+        db   "poiuy"
+        db   "09876"
+        db   "12345"
+        db   "qwert"
+        db   "asdfg"
+        db   $00,"zxcv"
+iics	db   $00,1,$0e,"MNB"   ;Tabulka klaves
+        db   $02,"LKJH"          ;pre caps shift
+        db   "POIUY"
+        db   $0c,$0f,$09,$0b,$0a
+        db   $07,$06,$04,$05,$08
+        db   "QWERT"
+        db   "ASDFG"
+        db   $1f,"ZXCV"
+;Tabulka klaves pre symbol shift, bohuzel pro MBC nutno prekopat
+iiss	db   $00,$10,$1e,".,*"  ;SPC,SS,mnb
+        db   $03,"=+-^"         ;ENT,lkjh
+	db   $22,";]["		;poiuy 
+        db   "_)(","'","&"	;09876
+	db   "!@#$%"		;12345
+	db   199,$13,$14,"<>"	;qwert	    misto 199 bylo #12
+        db   "~|",$5C,$7B,$7D	;asdfg	    \{}
+        db   $1d,":`?/"		;CS,zxcv
+ko
+le      =    ko-za
+

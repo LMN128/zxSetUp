@@ -1,0 +1,12 @@
+	module wait
+wait
+//	ex (SP),IX
+//	ex (SP),IX
+	dec hl
+	ld a,h
+	or l
+	jr nz,wait
+//	djnz wait
+	ret
+
+	endmodule

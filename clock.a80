@@ -1,0 +1,131 @@
+clock
+			ld ix,clockbuff3
+			ld bc,#0003
+			in a,(c)
+			and #0F
+			add a,48
+            or 128              //stop bit for print    
+			ld (ix+7),a		//1sec
+			ld bc,#0103
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+6),a		//10sec
+			ld bc,#0203
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+4),a		//1min
+			ld bc,#0303
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+3),a		//10min
+			ld bc,#0403
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+1),a		//1hour
+			ld bc,#0503
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+0),a		//10hour
+			ld bc,#0C03
+			in a,(c)			
+			and #7
+			sla	a
+			sla	a
+			ld hl,weekdays
+			ld d,0
+			ld e,a
+			add hl,de
+			ld de,clockbuff2
+			ld bc,4
+			ldir            //week day
+            ld ix,clockbuff
+			ld bc,#0603
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+1),a		//1day
+			ld bc,#0703
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+0),a		//10day	
+			ld bc,#0803
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+4),a		//1month
+			ld bc,#0903
+			in a,(c)
+			and #0F
+			add a,48
+			ld (ix+3),a		//10month
+			ld bc,#0A03
+			in a,(c)
+			and #0F
+			add a,48
+            or 128          //stop bit for print            
+			ld (ix+9),a		//1year
+			ld bc,#0B03
+			in a,(c)
+			and #0F
+			add a,48
+
+			ld (ix+8),a		//10year
+
+//			ld a,1
+//			out (254),a
+
+			ld a,7			//clear place
+			ld hl, 16384+2048+224+8
+			ld de, 16384+2048+224+8+1
+			ld bc,13
+            or a  //reset carry
+1			ld (hl),0
+			push bc
+			ldir
+			pop bc
+            
+			sbc hl,bc
+			inc h
+			ld d,h
+			ld e,l
+			inc e
+			dec a
+			jr nz, 1B
+
+//			ld a,2
+//			out (254),a
+printclock
+			//print clock            
+			ld	bc,#7790-79
+			ld	(txy51.cursor),bc			
+			ld hl,clockcolor
+			call txy51.txy
+
+			ld	bc,#77C5-79
+			ld	(txy51.cursor),bc			
+			ld hl,clockbuff2
+			call txy51.txy
+
+       		ld	bc,#77D8-79	
+			ld	(txy51.cursor),bc	
+			ld hl,clockbuff3
+			call txy51.txy	
+			ret
+
+clockcolor  db 16,7            
+clockbuff	dc "22/05/2073" 
+clockbuff2	dc "Tue "
+clockbuff3	dc "16:33:26"
+weekdays	dc "Sun "
+			dc "Mon "
+			dc "Tue "
+			dc "Wed "
+			dc "Thu "
+			dc "Fri "
+			dc "Sat "

@@ -1,0 +1,13 @@
+#Exclude all
+
+*
+!*/
+!.gitignore
+
+#Include
+!*.a80
+!*.bin
+!*.ch6
+
+
+
