@@ -104,7 +104,7 @@ printclock
 			//print clock            
 			ld	bc,#7790-79
 			ld	(txy51.cursor),bc			
-			ld hl,clockcolor
+			ld hl,clockbuff
 			call txy51.txy
 
 			ld	bc,#77C5-79
@@ -117,8 +117,7 @@ printclock
 			ld hl,clockbuff3
 			call txy51.txy	
 			ret
-
-clockcolor  db 16,7            
+         
 clockbuff	dc "22/05/2073" 
 clockbuff2	dc "Tue "
 clockbuff3	dc "16:33:26"

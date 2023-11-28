@@ -418,35 +418,25 @@ userlevel	call txy51.txy
 			out (c),a
 			inc b
 			in a,(c)
-			or a					//not send to internal USB-UART
-			jr z,3F
-			ex af,af'
+			push af					//keep value of the port
 			ld a,#01				//MB03+ mode
 			out (c),a
-
-			ld bc,#133B				; wifi ZXi TX port
-			ld hl,wifistring
-1						
-wfbusy		
-			in a,(c)
-			bit 1,a					
-			jr nz,wfbusy					
-			
-			ld a,(hl)			//test end of string
-			or a
-			jr z,2F
-			out (c),a
-			inc hl	
-			jr 1B
-wifistring  db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn't connect to wifi after reset
-			db "AT+RST",13,10
+				
+			ld hl,wifistring        //enable Autoconnect to Wifi
+            call at_send
+/*            ld hl,uart_buffer
+            call at_read */
+/*
+			ld hl,wifistring2        //reset esp
+            call at_send
+            call clear_fifo
+*/
+			jr 2F
+  
+wifistring	db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn't connect to wifi after reset
+//wifistring2	db "AT+RST",13,10			
 			db 0
-2			ld bc,ZXi_port0			//ZXi portselect
-			ld a,#39				//Expansion pack B - WiFi/PS2 slave
-			out (c),a
-			inc b
-			ex af,af'
-			out (c),a				//back previosu value
+2				
 
 			ld a,#2B
 			ld bc,ZXi_port0			//ZXi portselect
@@ -454,11 +444,28 @@ wifistring  db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn
 			inc b
 			in a,(c)		
 			or a					//is RTC enable
-			jr z,7F
+			jr z,3F
 			cp #FF					//old cores without #2B port
-			jr z,7F	
+			jr z,3F	
 
-			call clock
+			ld	bc,#7790-79
+			ld	(txy51.cursor),bc	
+			ld hl,ITIME_TXT1
+			call txy51.txy
+
+//			call clock
+			call get_time
+			
+			
+
+//return exp B settings
+3			ld bc,ZXi_port0			//ZXi portselect
+			ld a,#39				//Expansion pack B - WiFi/PS2 slave
+			out (c),a
+			inc b
+			pop af
+			out (c),a				//back previosu value			
+
 			ld a,#60				//FLASH active read olny for im1
 			out (#53),a
 			ld a,14					//SetUp Areas
@@ -468,6 +475,26 @@ wifistring  db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn
 			xor a
 			out (#27),a
 			out (#67),a
+
+			ld a,#2B
+			ld bc,ZXi_port0			//ZXi portselect
+			out (c),a
+			inc b
+			in a,(c)		
+			or a					//is RTC enable
+			jr z,7F
+			cp #FF					//old cores without #2B port
+			jr z,7F				
+
+			ld	bc,#7700
+			ld	(txy51.cursor),bc	
+			ld	hl,white			
+			ld a,(syn_OK)
+			or a
+			jr nz,1F
+			ld	hl,blue
+1			call txy51.txy
+//clock loop			
 3
 			ld bc,#0003
 			in a,(c)
@@ -3143,6 +3170,11 @@ FPGATYPE1	dc 16,7,"Au"
 FPGATYPE2	dc 16,7,"Au+"
 FPGATYPE3	dc 16,7,"unknown, update Core"
 
+ITIME_TXT1	dc 16,65,"synchronizing the time"
+
+white		dc 16,7," "
+blue		dc 16,1," "
+
 ; --------------- L I B R A R I E S ---------------------------------------		
 //INCLUDE "nasobeniHLDE.a80"
 	INCLUDE "draw-jugo.a80"
@@ -3172,6 +3204,7 @@ EsxLogo
 BSDOSLogo
 //	INCBIN "BSDOSLOGO.bin"	
 	INCLUDE "clock.a80"
+	INCLUDE "i-time.a80"
 DATE		db 16,0
 	LUA ALLPASS
 	_pc('db	"' .. os.date("%Y%m%d") .. '"') 
