@@ -56,9 +56,9 @@ ramcode
 			im 1
 			xor	a
 			ld	i, a
-/*			ld a,16
+			ld a,16
 			ld bc,32765
-			out (c),a*/
+			out (c),a
 			
 			// Setup keyboard first part
 /*			ld bc,u_ZXi_port0		;Uno
@@ -887,6 +887,10 @@ IN			ld	bc,#2003
 			ld	(txy51.cursor),bc
 			ld	hl,IN4		
 			call txy51.txy
+			ld	bc,#4810
+			ld	(txy51.cursor),bc
+			ld	hl,IN5		
+			call txy51.txy
 
 			ld hl, (fram_add+1)
 			ld a,(hl)
@@ -1644,7 +1648,7 @@ mice_set	ld hl,mice_VAL
 
 			ret
 		
-mice_VAL	db 0,1,2,3,4,5,6
+mice_VAL	db #FF,1,2,3,4,5,6 //drive 0 pro dissable, nyni 255
 
 ZCSD
 			ld	bc,#2003
@@ -2638,7 +2642,7 @@ REG_TAB
 			dw #2000 //FRAM address
 
 			dw IN
-			db 0,3
+			db 0,4
 			dw in_set
 			dw #2001
 			
@@ -2821,6 +2825,8 @@ IN3			db 16,7,"divSD    (512KB divSD)"
 			dc " "
 IN4			db 16,7,"divSD+MB (512KB divSD & MB02+)"
 			dc " "
+IN5			db 16,7,"SD only"
+			dc " "			
 
 
 AUDIO1		db 16,67,"Audio output"
