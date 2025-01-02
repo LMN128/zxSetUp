@@ -2617,7 +2617,7 @@ zxi_02D		db #00	//divSD
 zxi_02E		db #01	//DMA
 zxi_02F		db #01  //LIFO
 zxi_030		db #00	//CPU speed
-zxi_031		db #00	//CPU OverClock
+zxi_031		db #01	//CPU OverClock
 zxi_032		db #03	//CPU alternative clock change
 zxi_033		db #00
 zxi_034		db #00
