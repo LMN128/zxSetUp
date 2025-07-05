@@ -421,6 +421,16 @@ userlevel	call txy51.txy
 			push af					//keep value of the port
 			ld a,#01				//MB03+ mode
 			out (c),a
+
+			ld bc,ZXi_port0			//ZXi portselect
+			ld a,#1A				//DE9 connector
+			out (c),a
+			inc b
+			in a,(c)
+			push af					//keep value of the port
+			ld a,#00				//Atari joy mode
+			out (c),a
+
 				
 			ld hl,wifistring        //enable Autoconnect to Wifi
             call at_send
@@ -456,15 +466,21 @@ wifistring	db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn'
 //			call clock
 			call get_time
 			
-			
+//return DE9 settings
+3			ld bc,ZXi_port0			//ZXi portselect
+			ld a,#1A				//DE9 connector
+			out (c),a
+			inc b
+			pop af
+			out (c),a				//back previous value				
 
 //return exp B settings
-3			ld bc,ZXi_port0			//ZXi portselect
+			ld bc,ZXi_port0			//ZXi portselect
 			ld a,#39				//Expansion pack B - WiFi/PS2 slave
 			out (c),a
 			inc b
 			pop af
-			out (c),a				//back previosu value			
+			out (c),a				//back previous value			
 
 			ld a,#60				//FLASH active read olny for im1
 			out (#53),a
@@ -797,7 +813,7 @@ clean		ld a,8			//clear place
 			ld bc,4095
 			ld (hl),l
 			ldir	
-			ld   a,7
+			xor a
 			ld   HL,22528+(32*3)
 			ld   DE,22529+(32*3)
 			ld   BC,767-(32*3)
@@ -1070,6 +1086,14 @@ PAD			ld	bc,#2003
 			ld	(txy51.cursor),bc
 			ld	hl,PAD3
 			call txy51.txy
+			ld	bc,#4010
+			ld	(txy51.cursor),bc
+			ld	hl,PAD4
+			call txy51.txy
+			ld	bc,#4810
+			ld	(txy51.cursor),bc
+			ld	hl,PAD5
+			call txy51.txy
 			
 			ld hl, (fram_add+1)
 			ld a,(hl)
@@ -1098,7 +1122,7 @@ pad_set		ld hl,PAD_VAL
 
 			ret
 		
-PAD_VAL		db 0,1,2,3
+PAD_VAL		db 0,1,2,3,4
 
 
 MMC
@@ -1287,6 +1311,10 @@ DVT
 			ld	bc,#3010
 			ld	(txy51.cursor),bc
 			ld	hl,DVT2
+			call txy51.txy
+			ld	bc,#3810
+			ld	(txy51.cursor),bc
+			ld	hl,DVT3
 			call txy51.txy
 						
 			ld hl, (fram_add+1)
@@ -2667,7 +2695,7 @@ REG_TAB
 			dw #2003 
 
 			dw PAD
-			db 0,2
+			db 0,4
 			dw joy_set
 			dw #201A 
 			
@@ -2708,7 +2736,7 @@ REG_TAB
 */
 						
 			dw DVT
-			db 1,1
+			db 1,2
 			dw dvt_set
 			dw #2010  
 
@@ -2886,12 +2914,16 @@ TSFM2		db 16,7,"chip model: 0-AY, 1-YM"
 TSFM3		db 16,7,"stereo: 0-ACB, 1-ABC"
 			dc " "
 
-PAD1		db 16,67,"Joystick/GamePad type"
+PAD1		db 16,67,"Joystick/DE9 connector"
 			dc " "
-PAD2		db 16,7,"standard 8-bits era"
+PAD2		db 16,7,"standard joystick (8bits era)"
 			dc " "
 PAD3		db 16,7,"Sega controller (3-8 buttons)"
 			dc " "
+PAD4		db 16,7,"UART MB03+"
+			dc " "
+PAD5		db 16,7,"UART ZX128-AY"
+			dc " "							
 
 DVE1		db 16,67,"GigaScreen - old TV/Monitor sum colors effect"
 			dc " "
@@ -2908,8 +2940,10 @@ DVE6		db 16,7,"mode3: KeyLayer"
 
 DVT1		db 16,67,"TIMEX graphics modes"
 			dc " "
-DVT2		db 16,7,"enable"
+DVT2		db 16,7,"enable gfx modes"
 			dc " "
+DVT3		db 16,7,"enable read port hFF"
+			dc " "			
 
 DVU1		db 16,67,"ULAplus"
 			dc " "
