@@ -600,11 +600,11 @@ get_reg		ld hl, REG_TAB
 MOD1		call 0
 			ld (show_cur+1),a
 new_cur
-			ld hl, ERASETXT
+			ld hl, DESELECT
 			ld bc,#20E9
 			ld	(txy32.cursor),bc
 			
-			call txy32.txy
+			call txy32.txy //mazu pres 32 znaku
 			
 fram_add	ld a,(#FFFF)
 //			ld (show_cur+1),a
@@ -2532,7 +2532,7 @@ ZONE0		ld	bc,#2003
 			ld a,(max_cur+1)
 			ld b,a
 			ex af,af'
-			ld hl,exts_VAL
+			ld hl,zone_VAL
 			call cur_num
 			ret
 
@@ -3182,7 +3182,7 @@ STRIPS		db 16,66,32,32,32
 SELECT		db 16,66,0
 			dc " "		
 DESELECT	dc "  "
-ERASETXT	dc "   "	
+
 
 ADVS0		db 16,67,"User level: " 
 			dc 16,7," "			
