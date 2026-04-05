@@ -320,7 +320,7 @@ at_read     ld bc,#133B			// wifi ZXi TX port; hl-read buffer (2048)
 read_bytes_counter            ld a,#80
             dec a
             ld (read_bytes_counter+1),a
-            
+            ret z               // read max X bytes
             jr 1B  
 
 clear_fifo  ld bc,g_ZXi_port0

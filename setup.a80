@@ -364,7 +364,7 @@ userlevel	call txy51.txy
 			ld bc,ZXi_port0
 			out (c),a
 			inc b
-			in a,(c)	//00-Au,01-AuPlus,other Unknown
+			in a,(c)	//00-Au,01-AuPlus,02-RetroCoreX, other Unknown
 			ld	hl,FPGATYPE1
 			or a
 			jr z,1F
@@ -372,6 +372,9 @@ userlevel	call txy51.txy
 			cp 1
 			jr z,1F
 			ld	hl,FPGATYPE3
+			cp 2
+			jr z,1F
+			ld	hl,FPGATYPEno
 1			call txy51.txy
 
 			//SetUp date version
@@ -3208,7 +3211,8 @@ STVER		dc 16,67,"SetUp version:",16,7
 FPGATYPE	dc 16,67,"FPGA board: "
 FPGATYPE1	dc 16,7,"Au"
 FPGATYPE2	dc 16,7,"Au+"
-FPGATYPE3	dc 16,7,"unknown, update Core"
+FPGATYPE3	dc 16,7,"RCX"
+FPGATYPEno	dc 16,7,"unknown, update Core"
 
 ITIME_TXT1	dc 16,65,"synchronizing the time"
 
