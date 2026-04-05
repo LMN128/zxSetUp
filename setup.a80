@@ -600,8 +600,8 @@ get_reg		ld hl, REG_TAB
 MOD1		call 0
 			ld (show_cur+1),a
 new_cur
-			ld hl, DESELECT
-			ld bc,#20F0
+			ld hl, ERASETXT
+			ld bc,#20E9
 			ld	(txy32.cursor),bc
 			
 			call txy32.txy
@@ -3181,7 +3181,8 @@ STRIPS		db 16,66,32,32,32
 
 SELECT		db 16,66,0
 			dc " "		
-DESELECT	dc "  "	
+DESELECT	dc "  "
+ERASETXT	dc "   "	
 
 ADVS0		db 16,67,"User level: " 
 			dc 16,7," "			
