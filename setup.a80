@@ -513,6 +513,7 @@ wifistring	db "AT+CWAUTOCONN=1",13,10  //some zxuno sw set it to 0 and AP doesn'
 			jr nz,1F
 			ld	hl,blue
 1			call txy51.txy
+			call clock				//first fast show clock without wait to change seconds
 //clock loop			
 3
 			ld bc,#0003
@@ -3210,9 +3211,9 @@ COREFW1		dc 16,67,"FPGA Core:"
 COREFW2		dc 16,7,"20"
 STVER		dc 16,67,"SetUp version:",16,7																								
 FPGATYPE	dc 16,67,"FPGA board: "
-FPGATYPE1	dc 16,7,"Au"
-FPGATYPE2	dc 16,7,"Au+"
-FPGATYPE3	dc 16,7,"RCX"
+FPGATYPE1	dc 16,7,"Au "
+FPGATYPE2	dc 16,7,"Au+ "
+FPGATYPE3	dc 16,7,"RCX "
 FPGATYPEno	dc 16,7,"unknown, update Core"
 
 ITIME_TXT1	dc 16,65,"synchronizing the time"
