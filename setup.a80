@@ -3309,7 +3309,7 @@ baszac	db	0,1			;; Line number
 	dw	linlen			;; Line length
 linzac
 	db	CLEAR,'8',#0E,0,0
-	dw	ramcode-1
+	dw	maincode-1
 	db	0,':'
 	db	LOAD,'""',CODE,':'
 	db	RANDOMIZE,USR,'8',#0E,0,0
