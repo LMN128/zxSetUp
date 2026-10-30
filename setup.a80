@@ -50,6 +50,7 @@ endramtest	ld hl,ramcodeinrom
 ramcodeinrom	
 
 			ent						; restore address to compile to right place
+start			
 ramcode		
 			di						; for sna test
 			ld sp,0					; for sna test
@@ -3319,7 +3320,7 @@ linlen	=	$-linzac
 baslen	=	$-baszac
 	
 		
-	savesna  "setup.sna",ramcode
+	// savesna  "setup.sna",ramcode
 	EMPTYTAP "setup.tap"
 	SAVETAP  "setup.tap" , BASIC, setup , baszac,baslen,1
 	SAVETAP  "setup.tap",CODE,"setup",maincode,endramcode-maincode,maincode
